@@ -1,5 +1,9 @@
 # ☕ Cloud Café - Smart Café Management System
 
+<img src="https://go-skill-icons.vercel.app/api/icons?i=java"  alt="skills"/>
+
+![Startups App Demo](./cover/startups.png)
+
 ## Introduction
 
 The **Smart Café Management System** is designed to streamline the daily operations of a modern café using the **OSGI framework**. The system leverages a **microkernel architecture** to provide **modular, scalable, and efficient** management of key café operations. By dividing the system into **Producer** and **Consumer** bundles, the café can handle tasks such as **order processing, stock management, payment processing, and employee shift management** decoupled and flexible.
