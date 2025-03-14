@@ -1,0 +1,19 @@
+package com.cafe.order.producer;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+
+public class OrderProcessingActivator implements BundleActivator {
+
+	public void start(BundleContext context) throws Exception {
+		// Register the OrderProcessingService
+		System.out.println("Order Processing Service Started");
+		context.registerService(OrderProcessingService.class.getName(), new OrderProcessingServiceImpl(), null);
+		
+	}
+
+	public void stop(BundleContext context) throws Exception {
+		
+	}
+
+}

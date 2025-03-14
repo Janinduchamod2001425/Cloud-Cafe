@@ -1,0 +1,118 @@
+package com.cafe.order.producer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class OrderProcessingServiceImpl implements OrderProcessingService{
+
+	private Map<Integer, String> menu;
+	private Map<Integer, Double> prices;
+	private Map<Integer, Integer> order;
+	
+	public OrderProcessingServiceImpl() {
+		
+		// Initialize the menu items
+		menu = new HashMap<>();
+		menu.put(1, "Coffee");
+		menu.put(2, "Tea");
+		menu.put(3, "Sandwitch");
+		menu.put(4, "Cake");
+		menu.put(5, "Juice");
+		menu.put(6, "Cappuccino");
+		menu.put(7, "Muffin");
+		menu.put(8, "Pancakes");
+		menu.put(9, "Croissant");
+        menu.put(10, "Hot Choco");
+        
+        // Initialize the prices
+        prices = new HashMap<>();
+        prices.put(1, 200.0);
+        prices.put(2, 100.0);
+        prices.put(3, 150.0);
+        prices.put(4, 250.0);
+        prices.put(5, 120.0);
+        prices.put(6, 220.0);
+        prices.put(7, 80.0);
+        prices.put(8, 180.0);
+        prices.put(9, 90.0);
+        prices.put(10, 150.0);
+        
+        // Initialize the order
+        order = new HashMap<>();
+	}
+	
+	@Override
+	public void displayMenu() {
+		System.out.println();
+		System.out.println(" ~*~ Welcome to ☕ CLOUD Cafe ~*~ ");
+        System.out.println("==================================");
+        System.out.println("- O R D E R  P R O C E S S I N G -");
+        System.out.println("==================================");
+        System.out.println("___ Fast and Efficient Service ___");
+		System.out.println();
+	    System.out.println("--- 🍽️ Smart Cafe Menu ---");
+	    
+	    // Print table header
+	    System.out.println("+----+-----------------+-----------+");
+	    System.out.println("| No | Item            | Price (Rs)|");
+	    System.out.println("+----+-----------------+-----------+");
+
+	    // Print menu items in table format
+	    for (Map.Entry<Integer, String> entry : menu.entrySet()) {
+	        int itemNo = entry.getKey();
+	        String itemName = entry.getValue();
+	        double price = prices.get(itemNo);
+
+	        // Add emoji for better visual appeal
+	        String emoji = "";
+	        switch (itemNo) {
+	            case 1: emoji = "☕"; break; // Coffee
+	            case 2: emoji = "🍵"; break; // Tea
+	            case 3: emoji = "🥪"; break; // Sandwich
+	            case 4: emoji = "🎂"; break; // Cake
+	            case 5: emoji = "🧃"; break; // Juice
+	            case 6: emoji = "☕"; break; // Cappuccino
+	            case 7: emoji = "🧁"; break; // Muffin
+	            case 8: emoji = "🥞"; break; // Pancakes
+	            case 9: emoji = "🥐"; break; // Croissant
+	            case 10: emoji = "🍫"; break; // Hot Chocolate
+	        }
+
+	        System.out.printf("| %-2d | %s %-12s | %9.2f |\n", itemNo, emoji, itemName, price);
+	    }
+
+	    // Print table footer
+	    System.out.println("+----+----------------+-----------+");
+	    System.out.println();
+	}
+
+	@Override
+	public void placeOrder(int itemNo, int quantity) {
+		if (menu.containsKey(itemNo)) {
+			order.put(itemNo, order.getOrDefault(itemNo, 0) + quantity);
+			System.out.println("✅ " + menu.get(itemNo) + " x " + quantity + " added to order");
+		} else {
+			System.out.println("There's no Item with that Item No. !");
+		}
+	}
+
+	@Override
+	public double calculateTotal() {
+		double totalBill = 0.0;
+		for (Map.Entry<Integer, Integer> entry : order.entrySet()) {
+			totalBill += prices.get(entry.getKey()) * entry.getValue();
+		}
+		return totalBill;
+	}
+
+	@Override
+	public String getItemName(int itemNo) {
+		return menu.getOrDefault(itemNo, "Unknown Item");
+	}
+
+	@Override
+	public double getItemPrice(int itemNo) {
+		return prices.getOrDefault(itemNo, 0.0);
+	}
+	
+}

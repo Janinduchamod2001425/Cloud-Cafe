@@ -1,0 +1,7 @@
+package com.cafe.order.producer;
+
+public enum DiscountType {
+	PERCENTAGE_10, // 10% discount
+    FIXED_50,      // 50 off
+    NONE           // No discount
+}

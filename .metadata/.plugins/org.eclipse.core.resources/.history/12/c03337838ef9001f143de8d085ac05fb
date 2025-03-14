@@ -1,0 +1,5 @@
+package com.cafe.order.producer;
+
+public interface OrderProcessingService {
+
+}

@@ -1,0 +1,220 @@
+package com.cafe.order.consumer;
+
+import com.cafe.order.producer.DiscountType;
+import com.cafe.order.producer.OrderProcessingService;
+import com.cafe.order.producer.OrderType;
+import com.cafe.order.producer.PaymentType;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class OrderProcessingActivator implements BundleActivator {
+
+    private ServiceReference<OrderProcessingService> orderServiceRef;
+
+    public void start(BundleContext context) throws Exception {
+        System.out.println("🤵 Consumer Started (Waiter)");
+
+        // Get the OrderProcessingService from the OSGI service registry
+        orderServiceRef = context.getServiceReference(OrderProcessingService.class);
+        OrderProcessingService orderService = context.getService(orderServiceRef);
+
+        // Display the menu to the user
+        orderService.displayMenu();
+
+        // Use a single Scanner instance
+        Scanner scanner = new Scanner(System.in);
+
+        // Loop to ask for additional items
+        boolean addMoreItems = true;
+        
+        Map<Integer, Integer> order = new HashMap<>();
+        
+        while (addMoreItems) {
+            try {
+                // Ask for item number
+                System.out.print("Enter Item (Item No): ");
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Invalid input. Please enter a valid item number.");
+                    scanner.next(); // Consume invalid input
+                    continue;
+                }
+                int itemNo = scanner.nextInt();
+
+                // Ask for quantity
+                System.out.print("Enter Quantity: ");
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Invalid input. Please enter a valid quantity.");
+                    scanner.next(); // Consume invalid input
+                    continue;
+                }
+                int quantity = scanner.nextInt();
+
+                // Place the order
+                order.put(itemNo, order.getOrDefault(itemNo, 0) + quantity);
+                System.out.println("✅ " + orderService.getItemName(itemNo) + " x " + quantity + " added to order.");
+
+                System.out.println();
+                
+                // Ask if the user wants to add more items
+                System.out.print("Want to Add More Items? (Y or N): ");
+                String response = scanner.next().trim().toLowerCase();
+
+                System.out.println();
+                
+                // Check if the user wants to stop
+                if (response.equals("n") || response.equals("no")) {
+                    addMoreItems = false;
+                }
+            } catch (Exception e) {
+                System.out.println("Error processing input: " + e.getMessage());
+                scanner.nextLine(); // Clear invalid input
+            }
+        }
+        
+        // Calculate the total bill amount
+        double total = 0.0;
+        for (Map.Entry<Integer, Integer> entry : order.entrySet()) {
+            int itemNo = entry.getKey();
+            int quantity = entry.getValue();
+            double price = orderService.getItemPrice(itemNo) * quantity;
+            total += price;
+        }
+        
+        // Select Order Type
+        System.out.println("Select Order Type: ");
+        System.out.println();
+        System.out.println("1. Dine-in 🍽️");
+        System.out.println("2. Takeaway 🥡");
+        System.out.println("3. Delivery 🚚");
+        
+        System.out.print("Enter your choice (1-3): ");
+        int orderTypeChoice = scanner.nextInt();
+        
+        OrderType orderType = OrderType.values()[orderTypeChoice - 1];
+        orderService.selectOrderType(orderType);
+        
+        if (orderType == OrderType.DELIVERY) {
+        	System.out.println("Please enter your delivery details:");
+            System.out.print("Address: ");
+            String address = scanner.nextLine();
+
+            System.out.print("Phone Number: ");
+            String phoneNumber = scanner.nextLine();
+
+            double fee = 100.0;
+            
+            // Calculate delivery fee
+            double deliveryFee = orderService.applyDeliveryFee(total, orderTypeChoice)
+            
+        }
+        
+        System.out.println();
+        System.out.println("Total before discount: Rs." + total);
+        System.out.println();
+        
+        // Apply Discount
+        System.out.println("Select Discount Type:");
+        System.out.println("1. 10% Discount 💰");
+        System.out.println("2. Rs. 50 Off 🪙");
+        System.out.println("3. No Discount ❌");
+        
+        System.out.print("Enter your choice (1-3): ");
+        int discountChoice = scanner.nextInt();
+        
+        // Add discount to the total
+        DiscountType discountType = DiscountType.values()[discountChoice - 1];
+        double discountedTotal = orderService.applyDiscount(total, discountType);
+        
+        System.out.println("Total after discount: Rs." + discountedTotal);
+        System.out.println();
+        
+        // Process Payment
+        System.out.println("Select Payment Type:");
+        System.out.println("1. Cash 💵");
+        System.out.println("2. Credit Card 💳");
+        System.out.println("3. Digital Wallet 📱");
+        
+        System.out.print("Enter your choice (1-3): ");
+        int paymentChoice = scanner.nextInt();
+        
+        // Payment method
+        PaymentType paymentType = PaymentType.values()[paymentChoice - 1];
+        boolean paymentSuccess = orderService.processPayment(discountedTotal, paymentType);
+        
+        System.out.println();
+        if (paymentSuccess) {
+            System.out.println("✅ Payment successful!");
+        } else {
+            System.out.println("❌ Payment failed!");
+        }
+        System.out.println();
+        
+        // Display the order summary
+        displayOrderSummary(order, orderService, total, discountedTotal);
+    }
+
+    public void stop(BundleContext context) throws Exception {
+        System.out.println("🤵 Consumer Stopped (Waiter)");
+        context.ungetService(orderServiceRef);
+    }
+    
+    private void displayOrderSummary(Map<Integer, Integer> order, OrderProcessingService orderService, double total, double discountedTotal) {
+    	
+    	// Define fixed column widths
+        int itemColumnWidth = 20; // Width for the "Item" column
+        int priceColumnWidth = 11; // Width for the "Price (Rs)" column
+    	
+        // Calculate the total table width
+        int tableWidth = itemColumnWidth + priceColumnWidth + 7; // 7 accounts for borders and padding
+        
+        System.out.println("--- 🧾 Order Summary ---");
+        System.out.println("+" + "-".repeat(tableWidth - 2) + "+");
+        System.out.printf("| %-" + itemColumnWidth + "s | %" + priceColumnWidth + "s |\n", "Item", "Price (Rs)");
+        System.out.println("+" + "-".repeat(tableWidth - 2) + "+");
+          
+        for (Map.Entry<Integer, Integer> entry : order.entrySet()) {
+        	int itemNo = entry.getKey();
+        	int quantity = entry.getValue();
+        	String itemName = orderService.getItemName(itemNo);
+        	double price = orderService.getItemPrice(itemNo) * quantity;
+        	
+        	// Add icons
+        	String emoji = "";
+            switch (itemNo) {
+                case 1: emoji = "☕"; break; // Coffee
+                case 2: emoji = "🍵"; break; // Tea
+                case 3: emoji = "🥪"; break; // Sandwich
+                case 4: emoji = "🎂"; break; // Cake
+                case 5: emoji = "🧃"; break; // Juice
+                case 6: emoji = "☕"; break; // Cappuccino
+                case 7: emoji = "🧁"; break; // Muffin
+                case 8: emoji = "🥞"; break; // Pancakes
+                case 9: emoji = "🥐"; break; // Croissant
+                case 10: emoji = "🍫"; break; // Hot Chocolate
+            }
+
+            // Format the item name and quantity to fit the fixed column width
+            String itemDisplay = emoji + " " + itemName + " x " + quantity;
+            if (itemDisplay.length() > itemColumnWidth) {
+                itemDisplay = itemDisplay.substring(0, itemColumnWidth - 3) + "..."; // Truncate if too long
+            }
+
+            // Print the item row
+            System.out.printf("| %-" + itemColumnWidth + "s | %" + priceColumnWidth + ".2f |\n", itemDisplay, price);
+        }
+        
+        // Display the Total Bill Amount
+        System.out.println("+" + "-".repeat(tableWidth - 2) + "+");
+        System.out.printf("| %-" + itemColumnWidth + "s | %" + priceColumnWidth + ".2f |\n", "Subtotal", total);
+        System.out.printf("| %-" + itemColumnWidth + "s | %" + priceColumnWidth + ".2f |\n", "Discount Applied", (total - discountedTotal));
+        System.out.printf("| %-" + itemColumnWidth + "s | %" + priceColumnWidth + ".2f |\n", "Final Amount", discountedTotal);
+        System.out.println("+" + "-".repeat(tableWidth - 2) + "+");
+        
+    }
+}

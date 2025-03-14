@@ -1,0 +1,119 @@
+package com.cafe.order.consumer;
+
+import com.cafe.order.producer.OrderProcessingService;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class OrderProcessingActivator implements BundleActivator {
+
+    private ServiceReference<OrderProcessingService> orderServiceRef;
+
+    public void start(BundleContext context) throws Exception {
+        System.out.println("Waiter Started");
+
+        // Get the OrderProcessingService from the OSGI service registry
+        orderServiceRef = context.getServiceReference(OrderProcessingService.class);
+        OrderProcessingService orderService = context.getService(orderServiceRef);
+
+        // Display the menu to the user
+        orderService.displayMenu();
+
+        // Use a single Scanner instance (Do not close it)
+        Scanner scanner = new Scanner(System.in);
+
+        // Loop to ask for additional items
+        boolean addMoreItems = true;
+        
+        Map<Integer, Integer> order = new HashMap<>();
+        
+        while (addMoreItems) {
+            try {
+                // Ask for item number
+                System.out.print("Enter Item (Item No): ");
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Invalid input. Please enter a valid item number.");
+                    scanner.next(); // Consume invalid input
+                    continue;
+                }
+                int itemNo = scanner.nextInt();
+
+                // Ask for quantity
+                System.out.print("Enter Quantity: ");
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Invalid input. Please enter a valid quantity.");
+                    scanner.next(); // Consume invalid input
+                    continue;
+                }
+                int quantity = scanner.nextInt();
+
+                // Place the order
+                order.put(itemNo, order.getOrDefault(itemNo, 0) + quantity);
+                System.out.println("✅ " + orderService.getItemName(itemNo) + " x " + quantity + " added to order.");
+
+                // Ask if the user wants to add more items
+                System.out.print("Want to Add More Items? (Y or N): ");
+                String response = scanner.next().trim().toLowerCase();
+
+                // Check if the user wants to stop
+                if (response.equals("n") || response.equals("no")) {
+                    addMoreItems = false;
+                }
+            } catch (Exception e) {
+                System.out.println("Error processing input: " + e.getMessage());
+                scanner.nextLine(); // Clear invalid input
+            }
+        }
+
+        // Display the order summary
+        displayOrderSummary(order, orderService);
+    }
+
+    public void stop(BundleContext context) throws Exception {
+        System.out.println("Waiter Stopped");
+        context.ungetService(orderServiceRef);
+    }
+    
+    private void displayOrderSummary(Map<Integer, Integer> order, OrderProcessingService orderService) {
+    	System.out.println();
+        System.out.println("--- 🧾 Order Summary ---");
+        System.out.println("+----------------+-----------+");
+        System.out.println("| Item           | Price (Rs)|");
+        System.out.println("+----------------+-----------+");
+        
+        double total = 0.0;
+        
+        for (Map.Entry<Integer, Integer> entry : order.entrySet()) {
+        	int itemNo = entry.getKey();
+        	int quantity = entry.getValue();
+        	String itemName = orderService.getItemName(itemNo);
+        	double price = orderService.getItemPrice(itemNo) * quantity;
+        	total += price;
+        	
+        	String emoji = "";
+            switch (itemNo) {
+                case 1: emoji = "☕"; break; // Coffee
+                case 2: emoji = "🍵"; break; // Tea
+                case 3: emoji = "🥪"; break; // Sandwich
+                case 4: emoji = "🎂"; break; // Cake
+                case 5: emoji = "🧃"; break; // Juice
+                case 6: emoji = "☕"; break; // Cappuccino
+                case 7: emoji = "🧁"; break; // Muffin
+                case 8: emoji = "🥞"; break; // Pancakes
+                case 9: emoji = "🥐"; break; // Croissant
+                case 10: emoji = "🍫"; break; // Hot Chocolate
+            }
+
+            System.out.printf("| %s %-12s | %9.2f |\n", emoji, itemName + " x " + quantity, price);
+        }
+        
+        System.out.println("+----------------+-----------+");
+        System.out.printf("| Total          | %9.2f |\n", total);
+        System.out.println("+----------------+-----------+");
+        
+    }
+}

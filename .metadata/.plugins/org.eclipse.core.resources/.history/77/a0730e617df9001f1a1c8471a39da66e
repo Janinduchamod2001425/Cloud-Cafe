@@ -1,0 +1,8 @@
+package orderprocessingconsumer;
+
+public interface OrderProcessingService {
+	public void displayMenu(); // Function to display Menu
+	public void placeOrder(int itemNo, int quantity)
+	
+
+}

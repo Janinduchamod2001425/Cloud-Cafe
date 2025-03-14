@@ -1,0 +1,7 @@
+package com.cafe.order.consumer;
+
+public class OrderProcessingServiceImpl {
+	
+	
+	
+}

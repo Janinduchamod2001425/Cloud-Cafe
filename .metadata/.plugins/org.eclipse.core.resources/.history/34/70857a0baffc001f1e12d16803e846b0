@@ -1,0 +1,12 @@
+package com.cafe.order.producer;
+
+public interface OrderProcessingService {
+	// Display the menu
+	public void displayMenu();
+	
+	// Place an order with item number and quantity
+	public void placeOrder(int itemNo, int quantity);
+	public double calculateTotal();
+	String getItemName(int itemNo);
+	double getItemPrice(int itemNo);
+}

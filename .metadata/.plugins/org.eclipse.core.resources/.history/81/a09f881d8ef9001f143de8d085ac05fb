@@ -1,0 +1,9 @@
+package com.cafe.order.consumer;
+
+public interface OrderProcessingService {
+	
+	public void displayMenu(); // Function to display Menu
+	public void placeOrder(int itemNo, int quantity); // Function to place order
+	public double calculateTotal(); // Function to calculate total bill
+
+}

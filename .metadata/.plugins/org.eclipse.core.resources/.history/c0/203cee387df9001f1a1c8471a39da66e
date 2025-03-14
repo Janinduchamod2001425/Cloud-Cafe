@@ -1,0 +1,5 @@
+package orderprocessingconsumer;
+
+public interface OrderProcessingService {
+	publis void displayMenu(); 
+}
