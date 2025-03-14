@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The **Smart Café Management System** is designed to streamline the daily operations of a modern café using the **OSGI framework**. The system leverages a **microkernel architecture** to provide **modular, scalable, and efficient** management of key café operations. By dividing the system into **Producer** and **Consumer** bundles, the café can handle tasks such as **order processing, stock management, payment processing, and employee shift management** in a decoupled and flexible manner.
+The **Smart Café Management System** is designed to streamline the daily operations of a modern café using the **OSGI framework**. The system leverages a **microkernel architecture** to provide **modular, scalable, and efficient** management of key café operations. By dividing the system into **Producer** and **Consumer** bundles, the café can handle tasks such as **order processing, stock management, payment processing, and employee shift management** decoupled and flexible.
 
 ---
 
@@ -16,7 +16,7 @@ The **Order Processing Service** manages new orders and sends the details to the
 
 ## Order Management System Explanation
 
-The **Order Processing System** begins by welcoming the user and displaying a menu. Users select items, specify quantities, and confirm additions. They can choose to add more items or proceed to select an order type. The system calculates the total bill, applies a discount if selected, and displays the final amount. Users then select a payment method, and the system processes the payment. Finally, an order summary is displayed, and the system concludes with a **goodbye message**.
+The **Order Processing System** begins by welcoming the user and displaying a menu. Users select items, specify quantities, and confirm additions. They can choose to add more items or proceed to select an order type. The system calculates the total bill, applies a discount if specified, and displays the final amount. Users then select a payment method, and the system processes the payment. Finally, an order summary is displayed, and the system concludes with a **goodbye message**.
 
 ### 1️⃣ Welcome Message
 
@@ -100,3 +100,57 @@ The **Order Processing System** begins by welcoming the user and displaying a me
 ✔️ Flexible ordering options (**Dine-in, Takeaway, Delivery**).  
 
 ---
+
+## 📌 OSGI Framework Commands
+
+###### Start the OSGI Framework
+```sh
+java -jar felix.jar
+```
+
+###### Install the Producer Bundle
+```sh
+install file:OrderProcessingProducer.jar
+```
+
+###### Start the Producer Bundle
+```sh
+start file:OrderProcessingProducer.jar
+```
+or
+```sh
+start <bundle_id>
+```
+
+###### Stop the Producer Bundle
+```sh
+stop file:OrderProcessingProducer.jar
+```
+or
+```sh
+stop <bundle_id>
+```
+
+--- 
+
+###### Install the Consumer Bundle
+```sh
+install file:OrderProcessingConsumer.jar
+```
+
+###### Start the Consumer Bundle
+```sh
+start file:OrderProcessingConsumer.jar
+```
+or
+```sh
+start <bundle_id>
+```
+###### Stop the Consumer Bundle
+```sh
+stop file:OrderProcessingConsumer.jar
+```
+or
+```sh
+stop <bundle_id>
+```
