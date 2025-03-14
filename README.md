@@ -2,7 +2,7 @@
 
 <img src="https://go-skill-icons.vercel.app/api/icons?i=java"  alt="skills"/>
 
-![Startups App Demo](./cover/startups.png)
+![Cafe App Demo](./cover/cafe.png)
 
 ## Introduction
 
